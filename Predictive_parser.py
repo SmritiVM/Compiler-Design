@@ -1,5 +1,6 @@
 #PREDICTIVE PARSING
 
+#STEP 0
 #General representation of Grammar
 grammar = open("Grammar.txt")
 
@@ -36,7 +37,7 @@ print_productions(P_LHS, P_RHS)
 print("S: ", S)
 
 
-
+#STEP 1
 #Removing left recursion
 new_state = 90
 def add_new_production(new_P_LHS, new_P_RHS, lhs, rhs):
@@ -91,6 +92,7 @@ print_productions(P_LHS, P_RHS)
 V = V.union(set(P_LHS))
 
 
+#STEP 2
 #Removing left factoring
 def longest_common_prefix(strs):
     prefix = ""
@@ -159,6 +161,7 @@ print("\nGrammar after removing left factoring: ")
 print_productions(productions)
 
 
+#STEP 3.1
 #Computing first
 def find_first(variable, productions, first, wait):
     if variable not in first:
@@ -201,7 +204,7 @@ def compute_firsts(productions):
 
 first = compute_firsts(productions)
 
-
+#STEP 3.2
 ##Computing follow
 def get_key(val, my_dict):
     for key, value in my_dict.items():
@@ -265,10 +268,13 @@ def compute_follows(productions, first):
     print("\nFollows: ")
     for variable in follow:
         print(variable, follow[variable])
+    
+    return follow
 
-compute_follows(productions, first)
+follow = compute_follows(productions, first)
             
 
+#STEP 4 & 5
 #Parsing table
 #Constructing table
 T.add('$')
@@ -278,10 +284,11 @@ table = [['blank' for i in range(column_count + 1)] for _ in range(row_count + 1
 
 table[0][0] = ' '
 table[0][1:] = list(T)
-list_V = list(V)
+V = sorted(V)
+T = sorted(T)
 
 for i in range(1, row_count + 1):
-    table[i][0] = list_V[i - 1]
+    table[i][0] = V[i - 1]
 
 
 def print_table(table):
@@ -293,4 +300,51 @@ def print_table(table):
         print(f'|')
         print('_' * 112)
     
-print_table(table)
+#print_table(table)
+
+def add_production(row, symbol, T, variable, rule, table):
+    column = T.index(symbol)
+    if table[row + 1][column + 1] != 'blank':
+        return False
+    table[row + 1][column + 1] = variable + '-->' + rule
+    return True
+
+def fill_table(table, V, T, productions, first, follow):
+    for variable in productions:
+        row = V.index(variable)
+        for rule in productions[variable]:
+            if rule == 'epsilon':
+                next_symbol = 'epsilon'
+            else:
+                next_symbol = rule[0]
+
+            if next_symbol == 'epsilon':
+                symbols = follow[variable]
+                for symbol in symbols:
+                    check = add_production(row, symbol, T, variable, rule, table)
+                    if not check:
+                        return False
+
+            elif next_symbol in V:
+                symbols = first[next_symbol]
+                for symbol in symbols:
+                    check = add_production(row, symbol, T, variable, rule, table)
+                    if not check:
+                        return False
+            
+            else:
+                check = add_production(row, next_symbol, T,variable, rule, table)
+                if not check:
+                    return False
+    
+    return True
+
+fill = fill_table(table, V, T, productions, first, follow)
+if fill:
+    print_table(table)
+else:
+    print("Not LL Grammar")
+
+
+#STEP 6
+#Parsing and acceptance
