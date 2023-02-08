@@ -1,5 +1,5 @@
 #Left recursion, left factoring, firsts complete
-grammar = open("Grammar_.txt")
+grammar = open("Grammar.txt")
 
 V = set()
 T =  set()
@@ -209,10 +209,11 @@ def get_key(val, my_dict):
 def find_follow_for_epsilon(variable, productions, rules, follow, wait):
     parent = get_key(rules, productions)
     if parent in follow:
-        follow[variable].union(follow[parent])
+        follow[variable] = follow[variable].union(follow[parent])
+        
     else:
         wait.append(variable)
-    return wait
+    return follow, wait
         
 def find_follow(variable, productions, follow, wait, first):
     if variable not in follow:
@@ -229,7 +230,7 @@ def find_follow(variable, productions, follow, wait, first):
                 continue
         
             if index == len(rule) - 1:
-                wait = find_follow_for_epsilon(variable, productions, rules, follow, wait)
+                follow, wait = find_follow_for_epsilon(variable, productions, rules, follow, wait)
 
             elif rule[index + 1] in T:
                 follow[variable].add(rule[index + 1])
@@ -238,7 +239,7 @@ def find_follow(variable, productions, follow, wait, first):
                 next_symbol = rule[index + 1]
                 parent_first = first[next_symbol]
                 if 'epsilon' in parent_first:
-                    wait = find_follow_for_epsilon(variable, productions, rules, follow, wait)
+                    follow, wait = find_follow_for_epsilon(variable, productions, rules, follow, wait)
                 for symbol in parent_first:
                     if symbol != 'epsilon':
                         follow[variable].add(symbol)
@@ -259,7 +260,9 @@ def compute_follows(productions, first):
         find_follow(variable, productions, follow, wait, first)
     empty_waitlist(wait, productions, follow, first)
 
-    print(follow)
+    print("\nFollows: ")
+    for variable in follow:
+        print(variable, follow[variable])
 
 compute_follows(productions, first)
             
