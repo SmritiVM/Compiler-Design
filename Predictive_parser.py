@@ -266,3 +266,18 @@ def compute_follows(productions, first):
 
 compute_follows(productions, first)
             
+
+#Parsing table
+#Constructing table
+T.add('$')
+row_count = len(V)
+column_count = len(T)
+table = [['blank' for i in range(column_count + 1)] for _ in range(row_count + 1)]
+
+table[0][1:] = list(T)
+list_V = list(V)
+
+for i in range(1, row_count + 1):
+    table[i][0] = list_V[i - 1]
+
+print(*table, sep = '\n')
