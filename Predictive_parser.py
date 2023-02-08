@@ -276,10 +276,21 @@ row_count = len(V)
 column_count = len(T)
 table = [['blank' for i in range(column_count + 1)] for _ in range(row_count + 1)]
 
+table[0][0] = ' '
 table[0][1:] = list(T)
 list_V = list(V)
 
 for i in range(1, row_count + 1):
     table[i][0] = list_V[i - 1]
 
-print(*table, sep = '\n')
+
+def print_table(table):
+    print("\n\nParsing table\n")
+    print('_' * 112)
+    for row in table:
+        for entry in row:
+            print(f'|{entry:15}', end = '')
+        print(f'|')
+        print('_' * 112)
+    
+print_table(table)
