@@ -1,4 +1,6 @@
-#Left recursion, left factoring, firsts complete
+#PREDICTIVE PARSING
+
+#General representation of Grammar
 grammar = open("Grammar.txt")
 
 V = set()
