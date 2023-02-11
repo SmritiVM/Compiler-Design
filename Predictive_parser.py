@@ -282,10 +282,11 @@ row_count = len(V)
 column_count = len(T)
 table = [['blank' for i in range(column_count + 1)] for _ in range(row_count + 1)]
 
-table[0][0] = ' '
-table[0][1:] = list(T)
 V = sorted(V)
 T = sorted(T)
+table[0][0] = ' '
+table[0][1:] = list(T)
+
 
 for i in range(1, row_count + 1):
     table[i][0] = V[i - 1]
@@ -337,9 +338,9 @@ def fill_table(table, V, T, productions, first, follow):
                 if not check:
                     return False
     
-    return True
+    return True, table
 
-fill = fill_table(table, V, T, productions, first, follow)
+fill, table = fill_table(table, V, T, productions, first, follow)
 if fill:
     print_table(table)
 else:
@@ -348,3 +349,35 @@ else:
 
 #STEP 6
 #Parsing and acceptance
+test_input = input("Enter string to be tested: ")
+stack = ['$', S]
+ip_buffer = list(test_input) + ['$']
+
+
+while stack[-1] != '$':
+    top = stack.pop()
+    front = ip_buffer[0]
+    
+    if top in T:
+        if top != front:
+            print("Input Rejected")
+            exit()
+        else:
+            ip_buffer.pop(0)
+
+    
+    else:
+        row = V.index(top)
+        column = T.index(front)
+        state = table[row + 1][column + 1]
+        if state == 'blank':
+            print("Input Rejected")
+            exit()
+        
+        production = state.split('>')[1]
+        if production == 'epsilon':
+            continue
+        symbols = list(production)
+        stack.extend(symbols[::-1])
+
+print("Input Accepted")
