@@ -353,11 +353,15 @@ test_input = input("Enter string to be tested: ")
 stack = ['$', S]
 ip_buffer = list(test_input) + ['$']
 
+print('\nSTACK\tBUFFER\tACTION')
 
 while stack[-1] != '$':
+    print(''.join(stack), ''.join(ip_buffer), sep = '\t', end = '\t')
     top = stack.pop()
     front = ip_buffer[0]
     
+    action_flag = 1
+
     if top in T:
         if top != front:
             print("Input Rejected")
@@ -365,19 +369,27 @@ while stack[-1] != '$':
         else:
             ip_buffer.pop(0)
 
+        if top == front:
+            print("Remove",top)
+            action_flag = 0
+        
+
     
     else:
         row = V.index(top)
         column = T.index(front)
         state = table[row + 1][column + 1]
         if state == 'blank':
-            print("Input Rejected")
+            print("\nInput Rejected")
             exit()
         
+        if action_flag:
+            print(state)
+
         production = state.split('>')[1]
         if production == 'epsilon':
             continue
         symbols = list(production)
         stack.extend(symbols[::-1])
 
-print("Input Accepted")
+print("\nInput Accepted")
