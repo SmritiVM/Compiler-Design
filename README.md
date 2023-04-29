@@ -1,2 +1,3 @@
 # Compiler-Design
-A collection of my implementations of various parsers as required by my compiler design course
+Implementation of predictive parser in python
+Done as a part of compiler design course, 2023 
